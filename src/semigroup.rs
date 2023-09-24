@@ -11,7 +11,7 @@ impl Semigroup for String {
     }
 }
 
-//str slices will involve some significant work
+//str slices will involve significant work
 
 impl<T> Semigroup for Vec<T>
 where
@@ -24,7 +24,7 @@ where
     }
 }
 
-//which pointer types makes sense, Box, Cow, Rc?
+//which pointer types make sense, Box, Cow, Rc?
 
 impl<T> Semigroup for Box<T> where 
 T: Semigroup + Clone 
