@@ -1,4 +1,4 @@
-# rust-adts
+# rust-functional-adts
 
 
 
