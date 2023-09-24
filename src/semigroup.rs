@@ -1,51 +1,72 @@
-use std::ops::Add;
-
 pub trait Semigroup {
-    fn combine(&self, other: &Self) -> Self;
+    fn append(&self, other: &Self) -> Self;
 }
 
-impl<T: Add<Output = T> + Copy> Semigroup for T {
-    fn combine(&self, other: &Self) -> Self {
-        *self + *other
+//using push_str in place of format!
+impl Semigroup for String {
+    fn append(&self, other: &Self) -> Self {
+        let mut result = self.clone();
+        result.push_str(other);
+        result
     }
 }
 
+//str slices will involve some significant work
 
-//This doesn't consider overflows at all - and I'm not sure that defining 
-//combine as addition is actually proper so will see if this changes
+impl<T> Semigroup for Vec<T>
+where
+    T: Clone,
+{
+    fn append(&self, other: &Self) -> Self {
+        let mut result = self.clone();
+        result.extend(other.clone());
+        result
+    }
+}
+
+//which pointer types makes sense, Box, Cow, Rc?
+
+impl<T> Semigroup for Box<T> where 
+T: Semigroup + Clone 
+{
+    fn append(&self, other: &Self) -> Self {
+        Box::new((**self).append(&**other))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn i32_combine() {
-        let a = 5;
-        let b = 7;
-        assert_eq!(a.combine(&b), 12);
+    fn test_append_string() {
+        let a = String::from("Hello, ");
+        let b = String::from("world!");
+        let answer = String::from("Hello, world!");
+        assert_eq!(a.append(&b), answer);
     }
 
     #[test]
-    fn i64_combine() {
-        let a = 50000;
-        let b = 7453;
-        assert_eq!(a.combine(&b), 57453);
+    fn test_append_vec_uint() {
+        let a: Vec<u8> = vec![1, 2, 3];
+        let b: Vec<u8> = vec![4, 5, 6, 7];
+        let result: Vec<u8> = vec![1, 2, 3, 4, 5, 6, 7];
+        assert_eq!(a.append(&b), result)
     }
 
-    #[cfg(target_pointer_width = "32")]
     #[test]
-    fn test_isize_32_combine() {
-        // Testing for 32-bit architecture
-        let a: isize = 1_000_000;
-        let b: isize = 1_000_000;
-        assert_eq!(a.combine(&b), 2_000_000);
+    fn test_append_vec_slice() {
+        let a: Vec<&str> = vec!["a", "b", "c"];
+        let b: Vec<&str> = vec!["d", "e", "f", "g"];
+        let result: Vec<&str> = vec!["a", "b", "c", "d", "e", "f", "g"];
+        assert_eq!(a.append(&b), result)
     }
 
-    #[cfg(target_pointer_width = "64")]
     #[test]
-    fn test_isize_64_combine() {
-        // Testing for 64-bit architecture
-        let a: isize = 4_000_000_000_000;
-        let b: isize = 4_000_000_000_000;
-        assert_eq!(a.combine(&b), 8_000_000_000_000);
+    fn test_append_box_vec_i8() {
+        let a:Box<Vec<i8>> = Box::new(vec![1, 2, 3]);
+        let b:Box<Vec<i8>> = Box::new(vec![4, 5, 6, 7]);
+        let result: Box<Vec<i8>> = Box::new(vec![1, 2, 3, 4, 5, 6, 7]);
+        assert_eq!(a.append(&b), result)
     }
 }
