@@ -16,7 +16,7 @@ Learn more about StarkWare and their awesome Starknet tech, a permissionless lay
 
 1. Clone the repository:
    ```bash
-   git clone [repository-url]
+   git clone https://github.com/somthn0somthn/rust-functional-adts.git
 
 2. Run the tests:
    ```bash
