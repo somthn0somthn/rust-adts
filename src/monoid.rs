@@ -1,4 +1,4 @@
-use crate::semigroup::Semigroup;
+/* use crate::semigroup::Semigroup;
 
 pub trait Monoid: Semigroup {
     //type Output;
@@ -58,3 +58,4 @@ mod tests {
         assert_eq!(a.mappend(&b), String::from("Hello"));
     }
 }
+ */
