@@ -56,9 +56,9 @@ impl<T1: ToString> MonoidDef<T1, String> for &str {
 
 /* To Implement
 
-impl<T1: Clone> MonoidDef<Vec<T1>, Vec<T1>> for Vec<T1> 
+impl<T1: Clone> MonoidDef<Vec<T1>, Vec<T1>> for Vec<T1>
 
-impl<T: MonoidDef<T, TE>, U: MonoidDef<U,UE>, TE, UE> MonoidDef<(T,U), (TE,UE)> for (T, U) 
+impl<T: MonoidDef<T, TE>, U: MonoidDef<U,UE>, TE, UE> MonoidDef<(T,U), (TE,UE)> for (T, U)
 
 //Does this Cow implementation make sense - perhaps make another branch and play
 //around with an implementation
@@ -87,9 +87,9 @@ impl<'a> Semigroup<'a> for &'a str {
 }
  */
 
-impl<T1: Clone + MonoidDef<T1, TE>, TE> MonoidDef<Box<T1>, Box<TE>> for Box<T1> 
+impl<T1: Clone + MonoidDef<T1, TE>, TE> MonoidDef<Box<T1>, Box<TE>> for Box<T1>
 
-impl<T1: Clone + MonoidDef<T1, TE>, TE> MonoidDef<RefCell<T1>, RefCell<TE>> for RefCell<T1> 
+impl<T1: Clone + MonoidDef<T1, TE>, TE> MonoidDef<RefCell<T1>, RefCell<TE>> for RefCell<T1>
 
  */
 
@@ -112,7 +112,7 @@ mod tests {
 
         assert_eq!(b, c);
     }
-    
+
     #[test]
     fn test_slice_mempty() {
         let b = <&str as Monoid<&str, String>>::mempty();
@@ -120,14 +120,14 @@ mod tests {
 
         assert_eq!(b, c);
     }
-    
+
     #[test]
     fn test_string_mempty() {
         let b = <String as Monoid<String, String>>::mempty();
         let c = String::from("");
 
         assert_eq!(b, c);
-    } 
+    }
 
     #[test]
     fn test_mempty_rite_identity() {
