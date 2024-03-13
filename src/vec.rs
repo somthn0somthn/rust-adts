@@ -20,6 +20,25 @@ impl<A:Clone> Monoid for Concrete<Vec<forall_t>, A> {
     }
 }
 
+impl<A: Clone> Foldable for Concrete<Vec<forall_t>, A> {
+    fn foldr<G>(g: G, a: <Self as Unplug>::A, s: Self) -> <Self as Unplug>::A
+    where
+        G: FnMut(<Self as Unplug>::A, <Self as Unplug>::A) -> <Self as Unplug>::A + Clone,
+    {
+        let answer = s.unwrap.into_iter().fold(a, |acc, x| g.clone()(acc, x));
+        answer
+    }
+    fn foldMap<G, F>(g: G, s:Self) -> F
+    where
+        G:FnMut(<Self as Unplug>::A) -> F + Clone,
+        F: Monoid,
+    {
+        let answer = s.unwrap.into_iter().map(g).fold(F::mempty(), |acc, x| F::mappend(acc, x));
+        answer
+    }
+}
+
+
 impl<A> Functor for Concrete<Vec<forall_t>, A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
     where
@@ -71,18 +90,5 @@ impl<A:Clone> Monad for Concrete<Vec<forall_t>, A> {
                 .flatten()
                 .collect();
             Concrete::of(res)
-        }
-}
-
-impl<A:Clone> Foldable for Concrete<Vec<forall_t>, A> {
-    fn foldr<G>(g:G, a:<Self as Unplug>::A, s:Self) -> <Self as Unplug>::A
-    where
-        G: FnMut(<Self as Unplug>::A, <Self as Unplug>::A) -> <Self as Unplug>::A + Clone
-        {
-            let answer =
-                s.unwrap
-                .into_iter()
-                .fold(a, |acc, x| g.clone()(acc, x));
-            answer
         }
 }

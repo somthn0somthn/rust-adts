@@ -54,15 +54,20 @@ fn main() {
     let conc_vec1_i32: Concrete<Vec<forall_t>, i32> = Concrete::of(vec![1,2,3,4]);
     let conc_vec2_i32: Concrete<Vec<forall_t>, i32> = Concrete::of(vec![1,3,2,4]);
     let conc_vec3_i32: Concrete<Vec<forall_t>, i32> = Concrete::of(vec![2,2,2]);
+    let foldmap_vec: Concrete<Vec<forall_t>, i32> = Concrete::of(vec![1, 2, 3]);
 
     let answer1 = Applicative::app(conc_vec_fn_pointer, conc_vec1_i32);
     let answer2 = Monad::bind(fn_fn2, conc_vec2_i32);
     let answer3 = Foldable::foldr(closure3, 2, conc_vec3_i32);
+    
+    let foldmap_test_answer = <Concrete<Vec<forall_t>, i32>>::foldMap(fn_fn2, foldmap_vec);
 
+    
     print!("mempty :: {:?}\n", test_memtpy.unwrap);
     print!("mapped :: {:?}\n", mappend_test.unwrap);
     print!("returns :: {:?}\n", test_returns.unwrap);
     print!("foldable :: {}\n", answer3);
+    print!("foldMap :: {:?} \n", foldmap_test_answer.unwrap);
     print!("vec1 :: {:?}\n", answer1.unwrap);
     print!("vec2 :: {:?}\n", answer2.unwrap);
     print!("It compiles!!!\n");
