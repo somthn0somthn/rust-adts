@@ -38,14 +38,28 @@ where
     type result_t = Concrete<M, A>;
 }
 
-impl<M, A> Clone for Concrete<M, A> 
+impl<M, A> Clone for Concrete<M, A>
 where
     M: Unplug + Plug<A>,
     <M as Plug<A>>::result_t: Clone,
-    {
-        fn clone(&self) -> Self {
-            Concrete {
-                unwrap: self.unwrap.clone()
-            }
+{
+    fn clone(&self) -> Self {
+        Concrete {
+            unwrap: self.unwrap.clone(),
         }
     }
+}
+
+#[derive(Clone)]
+pub struct Wrapper<T> {
+    pub value: T,
+}
+
+impl<A> Unplug for Wrapper<A> {
+    type F = Wrapper<forall_t>;
+    type A = A;
+}
+
+impl<A, B> Plug<A> for Wrapper<B> {
+    type result_t = Wrapper<A>;
+}

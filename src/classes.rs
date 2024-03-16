@@ -1,11 +1,12 @@
-use crate::plug::{Concrete, Unplug, Plug, forall_t};
+use crate::plug::{Concrete, Unplug, Plug, forall_t, Wrapper};
 
-pub trait Monoid: Unplug + Plug<<Self as Unplug>::A> {
+pub trait Monoid {
     fn mempty() -> Self; //does fn mempty() -> Self make more sense
     fn mappend(a:Self, b:Self) -> Self;
 }
 
 //TODO is the Monoid constraint necessary here? Unplug constraint enough?
+//TODO does foldr make sense - the returned type has no wrapper - do some testing to see what bx works
 pub trait Foldable: Monoid {
     fn foldr<G>(g: G, a: <Self as Unplug>::A, s: Self) -> <Self as Unplug>::A
     where
@@ -17,6 +18,8 @@ pub trait Foldable: Monoid {
         G: FnMut(<Self as Unplug>::A) -> F + Clone,
         F: Monoid;
 }
+
+//TODO define Traversable
 
 pub trait Functor: Unplug + Plug<<Self as Unplug>::A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
