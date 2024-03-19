@@ -25,7 +25,7 @@ pub trait Functor: Unplug + Plug<<Self as Unplug>::A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
     where
         Self: Plug<B>,
-        F: FnMut(<Self as Unplug>::A) -> B;
+        F: FnMut(<Self as Unplug>::A) -> B + Clone;
 }
 
 pub trait Applicative: Functor {

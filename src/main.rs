@@ -3,6 +3,7 @@ pub mod classes;
 pub mod vec;
 pub mod sum;
 pub mod product;
+pub mod option;
 
 use plug::{Concrete, Unplug, Plug, forall_t, Wrapper};
 use classes::{Monoid, Functor, Applicative, Monad, Foldable};
@@ -40,15 +41,28 @@ fn int_to_conc_string(i: i32) -> Concrete<Vec<forall_t>, String> {
 }
 
 fn main() {
-    let conc_sum_type1 = Concrete::of(Wrapper { value: ProductMonoid { value: 4 }});
-    let conc_sum_type2 = Concrete::of(Wrapper { value: ProductMonoid { value: 5 }});
-    let sum_mappend = Monoid::mappend(conc_sum_type1, conc_sum_type2); 
+    let f_fn = |x: i32| x * 10;
+    let conc_appl_opt = Concrete::of(Some(f_fn));
+    let conc_opt = Concrete::of(Some(2));
+    let conc_opt_none: Concrete<Option<forall_t>, i32> = Concrete::of(None);
+    let answer1 = Applicative::app(conc_appl_opt.clone(), conc_opt);
+    let answer1_none = Applicative::app(conc_appl_opt, conc_opt_none);
 
-    let fn_to_monoid = |x: i32| ProductMonoid::new(x);
-    let foldmap_vec: Concrete<Vec<forall_t>, i32> = Concrete::of(vec![1, 2, 3, 4]);
-    let foldmap_test_answer = <Concrete<Vec<forall_t>, i32>>::foldMap(fn_to_monoid, foldmap_vec);
+    let fn_fn2 = |x: i32| int_to_string(x);
+    let conc_appl_opt2 = Concrete::of(Some(fn_fn2));
+    let conc_opt2 = Concrete::of(Some(3));
+    let conc_opt2_none: Concrete<Option<forall_t>, i32> = Concrete::of(None);
+    let answer2: Concrete<Option<forall_t>, String> = Applicative::app(conc_appl_opt2.clone(), conc_opt2);
+    let answer2_none = Applicative::app(conc_appl_opt2, conc_opt2_none);
 
-    print!("\nproduct & product mappend :: {:?}\n", sum_mappend.unwrap.value);
-    print!("foldmap using Product data constructor ::{:?}\n\n", foldmap_test_answer);
+    let opt_pure: Concrete<Option<forall_t>, i32> = Applicative::pure(100);
+
+    print!("\n");
+
+    print!("{:?}\n", answer1.unwrap);
+    print!("{:?}\n", answer1_none.unwrap);
+    print!("{:?}\n", answer2.unwrap);
+    print!("{:?}\n", answer2_none.unwrap);
+    print!("{:?}\n", opt_pure.unwrap);
     print!("It compiles!!!\n");
 }
