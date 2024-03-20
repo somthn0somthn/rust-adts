@@ -1,5 +1,5 @@
 use crate::plug::{Concrete, Unplug, Plug, forall_t};
-use crate::classes::{Monoid, Functor, Applicative};
+use crate::classes::{Monoid, Functor, Applicative, Monad};
 
 
 impl<A> Unplug for Option<A> {
@@ -44,4 +44,20 @@ impl<A: Clone> Applicative for Concrete<Option<forall_t>, A> {
             };
             Concrete::of(app_option)
         }
+}
+
+impl<A: Clone> Monad for Concrete<Option<forall_t>, A> {
+    fn returns(a: A) -> Self {
+        Concrete::of(Some(a))
+    }
+    fn bind<G, B>(g: G, s: Self) -> <Self as Plug<B>>::result_t
+    where
+        G: FnMut(<Self as Unplug>::A) -> <Self as Plug<B>>::result_t + Clone,
+    {
+        let mon_option = match s.unwrap {
+            Some(value) => g.clone()(value),
+            None => Concrete::of(None),
+        };
+        mon_option
+    }
 }
