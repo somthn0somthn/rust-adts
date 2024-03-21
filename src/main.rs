@@ -49,24 +49,28 @@ fn int_to_conc_opt_string(i: i32) -> Concrete<Option<forall_t>, String> {
 }
 
 fn main() {
-    let sum_a: Concrete<Option<forall_t>, SumMonoid<i32>> = Concrete::of(Some( SumMonoid { value: 1})); 
-    let sum_b: Concrete<Option<forall_t>, SumMonoid<i32>> = Concrete::of(Some( SumMonoid { value: 2}));
-    let sum_none: Concrete<Option<forall_t>, SumMonoid<i32>> = Concrete::of(None);
+    let sum_a: Concrete<Option<forall_t>, i32> = Concrete::of(Some( 2 )); 
+    let sum_none: Concrete<Option<forall_t>, i32> = Concrete::of(None);
 
-    let answer: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(sum_a, sum_b);
-    let answer_mempty: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mempty();
-    let answer2: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(answer_mempty.clone(), answer.clone());
-    let answer3: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(answer.clone(), answer_mempty.clone());
-    let answer4: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(answer_mempty.clone(), answer_mempty.clone());
+    let f_fn = |x: i32, y:i32| x * y;
+    let f_to_mon = |x: i32| SumMonoid::new(x);
+    let foldr_ans = Foldable::foldr(f_fn, 100, sum_a.clone());
+    let foldr_ans2 = Foldable::foldr(f_fn, 100, sum_none.clone());
+
+    let foldmap_ans: SumMonoid<i32> = Foldable::foldMap(f_to_mon, sum_a);
+    let foldmap_ans2: SumMonoid<i32> = Foldable::foldMap(f_to_mon, sum_none);
+
+    
 
 
     print!("\n");
 
-    print!("mapp {:?}\n", answer.unwrap);
-    print!("mempty {:?}\n", answer_mempty.unwrap);
-    print!("mapp2 {:?}\n", answer2.unwrap);
-    print!("mapp3 {:?}\n", answer3.unwrap);
-    print!("mapp4 {:?}\n", answer4.unwrap);
+    print!("foldr {:?}\n", foldr_ans);
+    print!("foldr {:?}\n", foldr_ans2);
+
+    print!("foldmap {:?}\n", foldmap_ans);
+    print!("foldmap {:?}\n", foldmap_ans2); 
+  
 
     print!("\n");
     print!("It compiles!!!\n");

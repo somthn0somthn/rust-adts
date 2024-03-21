@@ -5,9 +5,9 @@ pub trait Monoid {
     fn mappend(a:Self, b:Self) -> Self;
 }
 
-//TODO is the Monoid constraint necessary here? Unplug constraint enough?
+
 //TODO does foldr make sense - the returned type has no wrapper - do some testing to see what bx works
-pub trait Foldable: Monoid {
+pub trait Foldable: Unplug {
     fn foldr<G>(g: G, a: <Self as Unplug>::A, s: Self) -> <Self as Unplug>::A
     where
         Self: Unplug,

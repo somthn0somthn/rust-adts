@@ -11,6 +11,7 @@ pub trait MultiplicativeIdentity {
     fn multiplicative_identity() -> Self;
 }
 
+//TODO can this be condensed into a macro?
 impl MultiplicativeIdentity for i8 {
     fn multiplicative_identity() -> Self { 1 }
 }

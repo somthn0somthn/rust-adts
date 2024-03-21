@@ -1,5 +1,5 @@
 use crate::plug::{Concrete, Unplug, Plug, forall_t};
-use crate::classes::{Monoid, Functor, Applicative, Monad};
+use crate::classes::{Monoid, Foldable, Functor, Applicative, Monad};
 
 
 impl<A> Unplug for Option<A> {
@@ -23,6 +23,31 @@ impl<A: Clone + Monoid> Monoid for Concrete<Option<forall_t>, A> {
             (None, None) => None,
         };
         Concrete::of(res)
+    }
+}
+
+impl<A: Clone> Foldable for Concrete<Option<forall_t>, A> {
+    fn foldr<G>(g: G, a: <Self as Unplug>::A, s: Self) -> <Self as Unplug>::A
+    where
+        G: FnMut(<Self as Unplug>::A, <Self as Unplug>::A) -> <Self as Unplug>::A + Clone,
+    {
+        let res = match s.unwrap {
+            Some(value) => g.clone()(value, a),
+            None => a,
+        };
+        res
+    }
+
+    fn foldMap<G, F>(g: G, s:Self) -> F
+    where
+        G:FnMut(<Self as Unplug>::A) -> F + Clone,
+        F:Monoid,
+    {
+        let res = match s.unwrap {
+            Some(value) => g.clone()(value),
+            None => Monoid::mempty(),
+        };
+        res
     }
 }
 
