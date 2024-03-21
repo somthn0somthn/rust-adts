@@ -11,6 +11,21 @@ impl<A, B> Plug<A> for Option<B> {
     type result_t = Option<A>;
 }
 
+impl<A: Clone + Monoid> Monoid for Concrete<Option<forall_t>, A> {
+    fn mempty() -> Self {
+        Concrete::of(None)
+    }
+    fn mappend(a: Self, b: Self) -> Self {
+        let res = match (a.unwrap, b.unwrap) {
+            (Some(x), Some(y)) => Some(Monoid::mappend(x, y)),
+            (None, Some(y)) => Some(y),
+            (Some(x), None) => Some(x),
+            (None, None) => None,
+        };
+        Concrete::of(res)
+    }
+}
+
 impl<A> Functor for Concrete<Option<forall_t>, A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
     where 

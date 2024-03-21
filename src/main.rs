@@ -49,21 +49,26 @@ fn int_to_conc_opt_string(i: i32) -> Concrete<Option<forall_t>, String> {
 }
 
 fn main() {
-    let opt_returns: Concrete<Option<forall_t>, char> = Monad::returns('a');
-    let fn_monadic = |x: i32| int_to_conc_opt_string(x);
-    let opt_some: Concrete<Option<forall_t>, i32> = Concrete::of(Some(420));
-    let opt_none: Concrete<Option<forall_t>, i32> = Concrete::of(None);
+    let sum_a: Concrete<Option<forall_t>, SumMonoid<i32>> = Concrete::of(Some( SumMonoid { value: 1})); 
+    let sum_b: Concrete<Option<forall_t>, SumMonoid<i32>> = Concrete::of(Some( SumMonoid { value: 2}));
+    let sum_none: Concrete<Option<forall_t>, SumMonoid<i32>> = Concrete::of(None);
 
-    let answer1 = Monad::bind(fn_monadic.clone(), opt_some);
-    let answer2 = Monad::bind(fn_monadic, opt_none);
-    
-  
+    let answer: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(sum_a, sum_b);
+    let answer_mempty: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mempty();
+    let answer2: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(answer_mempty.clone(), answer.clone());
+    let answer3: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(answer.clone(), answer_mempty.clone());
+    let answer4: Concrete<Option<forall_t>, SumMonoid<i32>> = Monoid::mappend(answer_mempty.clone(), answer_mempty.clone());
+
+
     print!("\n");
 
-    print!("returns :: {:?}\n", opt_returns.unwrap);
-    print!("opt_some :: {:?}\n", answer1.unwrap);
-    print!("opt_none :: {:?}\n", answer2.unwrap); 
+    print!("mapp {:?}\n", answer.unwrap);
+    print!("mempty {:?}\n", answer_mempty.unwrap);
+    print!("mapp2 {:?}\n", answer2.unwrap);
+    print!("mapp3 {:?}\n", answer3.unwrap);
+    print!("mapp4 {:?}\n", answer4.unwrap);
 
+    print!("\n");
     print!("It compiles!!!\n");
 }
 
