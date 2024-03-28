@@ -45,3 +45,19 @@ impl<A: Clone, E> Applicative for Concrete<Result<forall_t, E>, A> {
             Concrete::of(app_result)
         }
 }
+
+impl<A: Clone, E> Monad for Concrete<Result<forall_t, E>, A> {
+    fn returns(a: A) -> Self {
+        Concrete::of(Ok(a))
+    }
+    fn bind<G, B>(g: G, s: Self) -> <Self as Plug<B>>::result_t
+    where
+        G: FnMut(<Self as Unplug>::A) -> <Self as Plug<B>>::result_t + Clone,
+    {
+        let mon_option = match s.unwrap {
+            Ok(value) => g.clone()(value),
+            Err(err) => Concrete::of(Err(err)),
+        };
+        mon_option
+    }
+}
