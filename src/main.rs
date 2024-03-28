@@ -57,20 +57,31 @@ fn int_to_conc_result_string(i: i32) -> Concrete<Result<forall_t, String>, Strin
     }
 }
 
+
 fn main() {
-    let start: Concrete<Result<forall_t, String>, i32> = Concrete::of(Ok(53));
-    let start_err: Concrete<Result<forall_t, String>, i32> = Concrete::of(Err("Error".to_string()));
-    let fn_f= |x| int_to_conc_result_string(x);
     
-    let mon_ret_res: Concrete<Result<forall_t, String>, i32> = Monad::returns(1965);
-    let mon_bind_ok = Monad::bind(fn_f.clone(), start.clone());
-    let mon_bind_err = Monad::bind(fn_f.clone(), start_err.clone());
-    
+    let sum1: SumMonoid<i32> = SumMonoid::new(1);
+    let sum20: SumMonoid<i32> = SumMonoid::new(20);
+
+    let res_sumM1: Concrete<Result<forall_t, String>, SumMonoid<i32>> = Concrete::of(Ok(sum1.clone()));
+    let res_sumM20: Concrete<Result<forall_t, String>, SumMonoid<i32>> = Concrete::of(Ok(sum20.clone()));
+    let res_sumErr: Concrete<Result<forall_t, String>, SumMonoid<i32>> = Concrete::of(Err("this non-defaul err".to_string()));
+
+    let ans1 = Monoid::mappend(res_sumM1.clone(), res_sumM20.clone());
+    let ans2= Monoid::mappend(Monoid::mempty(), res_sumM20.clone());
+    let ans3 = Monoid::mappend(res_sumM1.clone(), Monoid::mempty());
+    let ans4= Monoid::mappend(res_sumErr.clone(), res_sumM20.clone());
+    let ans5 = Monoid::mappend(res_sumM1.clone(), res_sumErr.clone());
+
     print!("\n");
     
-    print!("returns {:?}\n", mon_ret_res.unwrap);
-    print!("bind ok {:?}\n", mon_bind_ok.unwrap);
-    print!("bind err {:?}\n", mon_bind_err.unwrap);
+    print!("m1 <> m2 {:?}\n", ans1.unwrap);
+    print!("mempt <> m2 {:?}\n", ans2.unwrap);
+    print!("m1 <> mempty {:?}\n", ans3.unwrap);
+    print!("Err <> m2 {:?}\n", ans4.unwrap);
+    print!("m1 <> Err {:?}\n", ans5.unwrap);
+    
+    
 
     print!("\n");
     print!("It compiles!!!\n");

@@ -11,6 +11,21 @@ impl<A, B, E> Plug<A> for Result<B, E> {
     type result_t = Result<A, E>;
 }
 
+impl<A: Clone + Monoid, E: Default> Monoid for Concrete<Result<forall_t, E>, A> {
+    fn mempty() -> Self {
+        Concrete::of(Err(E::default()))
+    }
+    fn mappend(a: Self, b: Self) -> Self {
+        let res = match (a.unwrap, b.unwrap) {
+            (Ok(x), Ok(y)) => Ok(Monoid::mappend(x, y)),
+            (Err(_), Ok(y)) => Ok(y),
+            (Ok(x), Err(_)) => Ok(x),
+            (Err(_), Err(_)) => Err(E::default()),
+        };
+        Concrete::of(res)
+    }
+}
+
 impl<A, E> Functor for Concrete<Result<forall_t, E>, A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
     where
