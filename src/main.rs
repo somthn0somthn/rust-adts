@@ -59,31 +59,29 @@ fn int_to_conc_result_string(i: i32) -> Concrete<Result<forall_t, String>, Strin
 
 
 fn main() {
-    
-    let sum1: SumMonoid<i32> = SumMonoid::new(1);
-    let sum20: SumMonoid<i32> = SumMonoid::new(20);
 
-    let res_sumM1: Concrete<Result<forall_t, String>, SumMonoid<i32>> = Concrete::of(Ok(sum1.clone()));
-    let res_sumM20: Concrete<Result<forall_t, String>, SumMonoid<i32>> = Concrete::of(Ok(sum20.clone()));
-    let res_sumErr: Concrete<Result<forall_t, String>, SumMonoid<i32>> = Concrete::of(Err("this non-defaul err".to_string()));
+    let fn_foldr = |x, y| x + y;
+    let fn_to_monoid = |x: i32| ProductMonoid::new(x);
+    let foldable_res_ok: Concrete<Result<forall_t, String>, i32> = Concrete::of(Ok(42));
+    let foldable_res_err: Concrete<Result<forall_t, String>, i32> = Concrete::of(Err("No int".to_string()));
 
-    let ans1 = Monoid::mappend(res_sumM1.clone(), res_sumM20.clone());
-    let ans2= Monoid::mappend(Monoid::mempty(), res_sumM20.clone());
-    let ans3 = Monoid::mappend(res_sumM1.clone(), Monoid::mempty());
-    let ans4= Monoid::mappend(res_sumErr.clone(), res_sumM20.clone());
-    let ans5 = Monoid::mappend(res_sumM1.clone(), res_sumErr.clone());
+    let foldr_ok: i32 = Foldable::foldr(fn_foldr.clone(), 100, foldable_res_ok.clone());
+    let foldr_err: i32 = Foldable::foldr(fn_foldr.clone(), 25, foldable_res_err.clone());
+
+    let foldM_ok: ProductMonoid<i32> = Foldable::foldMap(fn_to_monoid.clone(), foldable_res_ok.clone());
+    let foldM_err: ProductMonoid<i32> = Foldable::foldMap(fn_to_monoid, foldable_res_err);
 
     print!("\n");
     
-    print!("m1 <> m2 {:?}\n", ans1.unwrap);
-    print!("mempt <> m2 {:?}\n", ans2.unwrap);
-    print!("m1 <> mempty {:?}\n", ans3.unwrap);
-    print!("Err <> m2 {:?}\n", ans4.unwrap);
-    print!("m1 <> Err {:?}\n", ans5.unwrap);
-    
-    
+    print!("foldr_ok {}\n", foldr_ok);
+    print!("foldr_err {}\n", foldr_err);
+
+
+    print!("nesting {:?}\n", Monoid::mappend(Foldable::foldMap(fn_to_monoid.clone(), foldable_res_ok.clone()), Foldable::foldMap(fn_to_monoid.clone(), foldable_res_ok.clone())));
+    print!("foldM_ok {:?}\n", foldM_ok);
+    print!("foldM_err {:?}\n", foldM_err);
+   
 
     print!("\n");
     print!("It compiles!!!\n");
 }
-

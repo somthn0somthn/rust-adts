@@ -26,6 +26,31 @@ impl<A: Clone + Monoid, E: Default> Monoid for Concrete<Result<forall_t, E>, A> 
     }
 }
 
+impl<A: Clone, E> Foldable for Concrete<Result<forall_t, E>, A> {
+    fn foldr<G>(g: G, a: <Self as Unplug>::A, s: Self) -> <Self as Unplug>::A 
+    where 
+        G: FnMut(<Self as Unplug>::A, <Self as Unplug>::A) -> <Self as Unplug>::A + Clone,
+    {
+        let res = match s.unwrap {
+            Ok(val) => g.clone()(val, a),
+            Err(err) => a,
+        };
+        res
+    }
+
+    fn foldMap<G, F>(g: G, s:Self) -> F
+    where 
+        G:FnMut(<Self as Unplug>::A) -> F + Clone,
+        F: Monoid,
+    {
+        let res = match s.unwrap {
+            Ok(val) => g.clone()(val),
+            Err(_) => Monoid::mempty()
+        };
+        res
+    }
+}
+
 impl<A, E> Functor for Concrete<Result<forall_t, E>, A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
     where
