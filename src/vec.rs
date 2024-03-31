@@ -1,5 +1,5 @@
 use crate::plug::{Concrete, Unplug, Plug, forall_t};
-use crate::classes::{Monoid, Functor, Applicative, Monad, Foldable};
+use crate::classes::{Monoid, Functor, Applicative, Monad, Foldable, Traversable};
 
 impl<A, B> Plug<A> for Vec<B> {
     type result_t = Vec<A>;
@@ -25,7 +25,7 @@ impl<A: Clone> Foldable for Concrete<Vec<forall_t>, A> {
     where
         G: FnMut(<Self as Unplug>::A, <Self as Unplug>::A) -> <Self as Unplug>::A + Clone,
     {
-        let answer = s.unwrap.into_iter().fold(a, |acc, x| g.clone()(acc, x));
+        let answer = s.unwrap.into_iter().rev().fold(a, |acc, x| g.clone()(acc, x));
         answer
     }
     fn foldMap<G, F>(g: G, s:Self) -> F
@@ -38,6 +38,25 @@ impl<A: Clone> Foldable for Concrete<Vec<forall_t>, A> {
     }
 }
 
+impl<B: Clone> Traversable for Concrete<Vec<forall_t>, Option<B>> {
+    type Output = Concrete< Option<forall_t>, Vec<B>>;
+
+    fn sequence(self) -> Self::Output {
+        let maybe_vec_b: Option<Vec<B>> = self.unwrap.into_iter().collect(); // Use Rust's built-in collect behavior for Options
+
+        Concrete::of(maybe_vec_b)
+}
+}
+
+impl<B: Clone, E: Default> Traversable for Concrete<Vec<forall_t>, Result<B,E>> {
+    type Output = Concrete< Result<forall_t, E>, Vec<B>>;
+
+    fn sequence(self) -> Self::Output {
+        let maybe_vec_b: Result<Vec<B>, E> = self.unwrap.into_iter().collect(); // Use Rust's built-in collect behavior for Options
+
+        Concrete::of(maybe_vec_b)
+}
+}
 
 impl<A> Functor for Concrete<Vec<forall_t>, A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
