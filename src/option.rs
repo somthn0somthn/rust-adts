@@ -1,5 +1,5 @@
 use crate::plug::{Concrete, Unplug, Plug, forall_t};
-use crate::classes::{Monoid, Foldable, Functor, Applicative, Monad};
+use crate::classes::{Monoid, Foldable, Functor, Applicative, Monad, Traversable};
 
 
 impl<A> Unplug for Option<A> {
@@ -46,6 +46,31 @@ impl<A: Clone> Foldable for Concrete<Option<forall_t>, A> {
         let res = match s.unwrap {
             Some(value) => g.clone()(value),
             None => Monoid::mempty(),
+        };
+        res
+    }
+}
+
+impl<B: Clone> Traversable for Concrete<Option<forall_t>, Vec<B>> {
+    type Output = Concrete<Vec<forall_t>, Option<B>>;
+
+    fn sequence(self) -> Self::Output {
+        let res = match self.unwrap {
+            Some(vec) => vec.into_iter().map(|x| Some(x)).collect(),
+            None => vec![],
+        };
+        Concrete::of(res)
+    }
+
+}
+
+impl<B: Clone, E: Default> Traversable for Concrete<Option<forall_t>, Result<B, E>> {
+    type Output = Concrete<Result<forall_t, E>, Option<B>>;
+
+    fn sequence(self) -> Self::Output {
+        let res = match self.unwrap {
+            Some(res) => Functor::map(|x| Some(x), Concrete::of(res)),
+            None => Concrete::of(Err(E::default())),
         };
         res
     }

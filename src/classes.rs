@@ -19,7 +19,13 @@ pub trait Foldable: Unplug {
         F: Monoid;
 }
 
-//TODO define Traversable
+//manual implementation of Traversable per type without the appropriate constraints
+//not ideal
+pub trait Traversable: Functor {
+    type Output;
+
+    fn sequence(self) -> Self::Output;
+}
 
 pub trait Functor: Unplug + Plug<<Self as Unplug>::A> {
     fn map<F, B>(f: F, s: Self) -> <Self as Plug<B>>::result_t
